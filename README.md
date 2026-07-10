@@ -5,7 +5,8 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
 [![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)]()
 
-一个**单文件、零依赖**的 Python HTTP 服务器，作为 AI 工具与本地文件系统之间的桥梁，让AI Agent通过网页版 AI 完成对话和工具调用。通过 HTTP API 接收请求，写入本地文件供 AI 工具读取，再将 AI 的响应返回给调用方。**仅供学习参考，请于下载后24h内删除，使用时请严格遵循服务商用户协议，请勿自动化访问、大规模商用或去除 AI 生成内容标识。**
+一个**单文件、零依赖**的 Python HTTP 服务器，作为 AI 工具与本地文件系统之间的桥梁，让AI Agent通过网页版 AI 完成对话和工具调用。通过 HTTP API 接收请求，写入本地文件供 AI 工具读取，再将 AI 的响应返回给调用方。
+**仅供学习参考，请于下载后24h内删除，使用时请严格遵循服务商用户协议，请勿自动化访问、大规模商用或去除 AI 生成内容标识。**
 
 ## 为什么需要它？
 

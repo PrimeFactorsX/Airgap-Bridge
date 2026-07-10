@@ -170,3 +170,178 @@ A: 启用多用户模式，为每个客户端分配不同的用户名。
 ## 许可证
 
 MIT License。详见 [LICENSE](LICENSE) 文件。
+
+---
+
+# Airgap-Bridge
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-green.svg)](https://www.python.org/)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
+[![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)]()
+
+A **single-file, zero-dependency** Python HTTP server that acts as a bridge between AI tools and the local file system, enabling AI agents to complete conversations and tool calls through web-based AI interfaces. It receives requests via HTTP API, writes them to local files for AI tools to read, and returns the AI's response to the caller.
+
+**For educational purposes only. Please delete within 24 hours of download. When using, strictly follow the service provider's user agreement. Do not use for automated access, large-scale commercial purposes, or any other behavior that violates the service provider's user agreement.**
+
+## Why is it needed?
+
+When you need to chain any HTTP client (or an AI tool that supports custom API endpoints) with a manually-operated AI web interface locally, this bridge server acts as the middleman:
+
+- The client sends a POST request to the server
+- The server writes the request content to `request.txt`
+- You (or an AI tool) read and process the request, then write the response to `response.txt`
+- The server detects the response and returns it as JSON to the client
+
+The entire process is completely local, with no dependency on any external API services or API keys.
+
+## Core Features
+
+- **Zero dependencies**: Uses only Python 3.8+ standard library — no pip install required
+- **Auto-initialization**: Automatically generates `config.json`, cache directory, and startup scripts on first run
+- **Multi-user support**: Optional multi-user mode with data isolation via HTTP headers or URL parameters
+- **Session recording**: Configurable conversation history saving in JSON format
+- **CORS support**: Built-in cross-origin request handling
+- **Privacy & security**: Logs never record user input content; all data stored locally
+- **Cross-platform**: Runs on Windows, macOS, and Linux
+- **Configurable endpoints**: Custom API paths and wrapper templates
+
+## Quick Start
+
+### Requirements
+- Python 3.8 or higher
+- Any operating system (Windows / macOS / Linux)
+
+### 1. Download the project
+
+Download or clone the repository files to a local folder, ensuring the following are included:
+- `bridge_server.py` — Main program
+- `start_bridge.bat` — Windows startup script
+- `start_bridge.sh` — macOS/Linux startup script
+
+### 2. Start the server
+
+**Windows users**
+
+Double-click `start_bridge.bat`.
+
+**macOS / Linux users**
+
+Open a terminal, navigate to the project directory, and run:
+```bash
+chmod +x start_bridge.sh
+./start_bridge.sh
+```
+
+Or run directly:
+```bash
+python3 bridge_server.py
+```
+
+On first run, `config.json` and required directories are created automatically. Upon successful startup:
+```
+Server started: http://localhost:5000/bridge/messages
+Health check: http://localhost:5000/health
+```
+
+### 3. Test the connection
+
+```bash
+# Health check
+curl http://localhost:5000/health
+
+# Send a message
+curl -X POST http://localhost:5000/bridge/messages \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Please write a Python Hello World"}'
+```
+
+### 4. Usage flow
+
+After the server receives a POST request:
+1. Writes the wrapped request to `user_data/default/request.txt`
+2. Polls until `user_data/default/response.txt` is written with non-empty content
+3. Reads the response and returns it as JSON
+
+You can operate manually or use AI tools with file read/write capabilities to automate the process.
+
+## Configuration
+
+`config.json` is auto-generated on first run:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `port` | `5000` | HTTP server listening port |
+| `cache_folder` | `"./cache"` | Cache directory path |
+| `endpoint` | `"/bridge/messages"` | API endpoint path |
+| `wrapper_template` | (preset template) | Prompt template for wrapping user messages, using `{user_message}` placeholder |
+| `multi_user` | `false` | Enable multi-user mode |
+| `user_data_folder` | `"./user_data"` | Root directory for user data storage |
+| `save_sessions` | `false` | Save conversation history |
+| `session_folder` | `"./sessions"` | Session record storage directory |
+| `clear_cache_on_start` | `true` | Clear cache on startup |
+
+Modify the config and restart the server for changes to take effect. If the config is corrupted or missing, the server uses built-in defaults and auto-rebuilds.
+
+### Multi-user mode
+
+Set `"multi_user": true` to enable:
+- Specify user via request header `X-User-ID: alice`
+- Or via URL parameter `?user=alice`
+- Each user gets an isolated `user_data/<user_id>/` directory
+
+> ⚠️ **Security warning**: Multi-user mode does not include authentication. It is intended only for local trusted environments. Do not enable on public networks or shared servers.
+
+## Project Structure
+
+```
+Bridge_Serve_Open/
+├── bridge_server.py       # Main program (single file, zero dependencies)
+├── start_bridge.bat       # Windows startup script
+├── start_bridge.sh        # macOS/Linux startup script
+├── config.json            # (auto-generated) User configuration file
+├── bridge_server.log      # (auto-generated) Log file
+├── cache/                 # (auto-generated) Cache directory
+├── user_data/             # (auto-generated) User data directory
+│   └── default/
+│       ├── request.txt
+│       └── response.txt
+├── sessions/              # (optional) Session records
+├── README.md
+└── LICENSE
+```
+
+## FAQ
+
+**Q: Port already in use?**
+
+A: Change `port` in `config.json` to a different value (e.g. `8080`) and restart the server.
+
+**Q: Chinese characters appear garbled?**
+
+A: All server file operations use UTF-8 encoding. Windows users should ensure `start_bridge.bat` includes `chcp 65001` (provided by default).
+
+**Q: Request timeout?**
+
+A: The server waits up to 300 seconds by default. Ensure the response is written to `response.txt` before the timeout.
+
+**Q: How to serve multiple clients simultaneously?**
+
+A: Enable multi-user mode and assign a different username to each client.
+
+## Contributing
+
+Issues and pull requests are welcome!
+
+This project is licensed under the [MIT License](LICENSE). By contributing, you agree that your code will be licensed under the same terms.
+
+## Disclaimer
+
+- This project is for personal study and research only, and does not provide any commercial services or guarantees
+- Users assume all risks of use; the developer is not responsible for any losses caused by using this project
+- When using this project, please comply with the third-party terms and conditions of the AI services you use
+- All data is stored locally; the developer does not collect, upload, or access any user data
+
+## License
+
+MIT License. See the [LICENSE](LICENSE) file for details.
